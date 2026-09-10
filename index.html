@@ -1,0 +1,631 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EHKDialogs Extension - Block Reference</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #0f172a; color: #f8fafc; }
+        .code-font { font-family: 'Fira Code', monospace; }
+
+        /* App Inventor Visual Block Styling */
+        .ai2-block {
+            font-family: 'Inter', sans-serif;
+            font-size: 13px;
+            font-weight: 700;
+            border-radius: 6px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+            position: relative;
+            user-select: none;
+        }
+
+        /* Call (Method) Blocks */
+        .ai2-call-block {
+            background: linear-gradient(180deg, #0284c7 0%, #0369a1 100%);
+            border: 2px solid #075985;
+            color: #ffffff;
+        }
+
+        /* Event Blocks */
+        .ai2-event-block {
+            background: linear-gradient(180deg, #d97706 0%, #b45309 100%);
+            border: 2px solid #92400e;
+            color: #ffffff;
+        }
+
+        /* Block Header / Title Bar */
+        .ai2-block-header {
+            padding: 8px 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            letter-spacing: 0.2px;
+        }
+
+        /* Sockets Area */
+        .ai2-sockets-container {
+            background-color: rgba(15, 23, 42, 0.25);
+            border-top: 1px solid rgba(0, 0, 0, 0.2);
+            padding: 6px 8px 8px 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        /* Single Input Socket Slot */
+        .ai2-socket {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 4px;
+            padding: 4px 8px;
+            border-left: 3px solid transparent;
+        }
+
+        /* Socket Type Colors matching AI2 specs */
+        .socket-text { border-left-color: #ec4899; }
+        .socket-number { border-left-color: #3b82f6; }
+        .socket-logic { border-left-color: #22c55e; }
+        .socket-component { border-left-color: #14b8a6; }
+        .socket-list { border-left-color: #a855f7; }
+
+        /* Badges for Socket Types */
+        .type-badge {
+            font-size: 10px;
+            font-weight: 600;
+            padding: 2px 6px;
+            border-radius: 3px;
+            text-transform: uppercase;
+            font-family: 'Fira Code', monospace;
+        }
+        .badge-text { background-color: #831843; color: #fbcfe8; }
+        .badge-number { background-color: #1e3a8a; color: #bfdbfe; }
+        .badge-logic { background-color: #14532d; color: #bbf7d0; }
+        .badge-component { background-color: #134e4a; color: #99f6e4; }
+        .badge-list { background-color: #581c87; color: #e9d5ff; }
+
+        /* Output Param Chips for Events */
+        .event-param-chip {
+            background: #9a3412;
+            color: #ffedd5;
+            border: 1px solid #ea580c;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-family: 'Fira Code', monospace;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body class="p-4 md:p-8 max-w-7xl mx-auto space-y-10">
+
+    <!-- PAGE TITLE SECTION -->
+    <div class="border-b border-slate-800 pb-6">
+        <h1 class="text-3xl font-extrabold text-white tracking-tight flex items-center gap-3">
+            <i class="fa-solid fa-puzzle-piece text-cyan-400"></i>
+            EHKDialogs Block Reference
+        </h1>
+        <p class="mt-2 text-slate-400 text-sm max-w-3xl">
+            Visual block specifications, sockets, and callback handlers for the EHKDialogs extension.
+        </p>
+    </div>
+
+    <!-- QUICK LEGEND -->
+    <div class="bg-slate-900 border border-slate-800 rounded-xl p-4 flex flex-wrap items-center gap-6 text-xs">
+        <span class="text-slate-400 font-bold uppercase tracking-wider">Socket Types:</span>
+        <span class="flex items-center gap-2"><span class="w-3 h-3 rounded bg-pink-500"></span> Text Socket</span>
+        <span class="flex items-center gap-2"><span class="w-3 h-3 rounded bg-blue-500"></span> Number Socket</span>
+        <span class="flex items-center gap-2"><span class="w-3 h-3 rounded bg-green-500"></span> Logic (Boolean)</span>
+        <span class="flex items-center gap-2"><span class="w-3 h-3 rounded bg-teal-500"></span> Component</span>
+        <span class="flex items-center gap-2"><span class="w-3 h-3 rounded bg-purple-500"></span> List Socket</span>
+    </div>
+
+    <!-- SECTION: METHOD / CALL BLOCKS -->
+    <section class="space-y-6">
+        <div class="flex items-center gap-2 border-b border-slate-800 pb-3">
+            <i class="fa-solid fa-cube text-cyan-400"></i>
+            <h2 class="text-xl font-bold text-white">Call Method Blocks</h2>
+        </div>
+
+        <div class="space-y-8">
+
+            <!-- 1. ShowPasswordSetupDialog -->
+            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 space-y-4">
+                <div class="ai2-block ai2-call-block">
+                    <div class="ai2-block-header">
+                        <span class="text-sky-200">call</span>
+                        <span class="text-white text-base">EHKDialogs . ShowPasswordSetupDialog</span>
+                    </div>
+                    <div class="ai2-sockets-container">
+                        <div class="ai2-socket socket-text">
+                            <span class="text-slate-200">title</span>
+                            <span class="type-badge badge-text">Text</span>
+                        </div>
+                        <div class="ai2-socket socket-text">
+                            <span class="text-slate-200">message</span>
+                            <span class="type-badge badge-text">Text</span>
+                        </div>
+                        <div class="ai2-socket socket-number">
+                            <span class="text-slate-200">minChars</span>
+                            <span class="type-badge badge-number">Number</span>
+                        </div>
+                        <div class="ai2-socket socket-number">
+                            <span class="text-slate-200">maxChars</span>
+                            <span class="type-badge badge-number">Number</span>
+                        </div>
+                        <div class="ai2-socket socket-text">
+                            <span class="text-slate-200">charErrorMsg</span>
+                            <span class="type-badge badge-text">Text</span>
+                        </div>
+                        <div class="ai2-socket socket-logic">
+                            <span class="text-slate-200">requireCase</span>
+                            <span class="type-badge badge-logic">Logic (true/false)</span>
+                        </div>
+                        <div class="ai2-socket socket-text">
+                            <span class="text-slate-200">caseErrorMsg</span>
+                            <span class="type-badge badge-text">Text</span>
+                        </div>
+                        <div class="ai2-socket socket-logic">
+                            <span class="text-slate-200">requireDigit</span>
+                            <span class="type-badge badge-logic">Logic (true/false)</span>
+                        </div>
+                        <div class="ai2-socket socket-text">
+                            <span class="text-slate-200">digitErrorMsg</span>
+                            <span class="type-badge badge-text">Text</span>
+                        </div>
+                        <div class="ai2-socket socket-text">
+                            <span class="text-slate-200">sha256Salt</span>
+                            <span class="type-badge badge-text">Text / "false"</span>
+                        </div>
+                        <div class="ai2-socket socket-component">
+                            <span class="text-slate-200">tinyDbInstance</span>
+                            <span class="type-badge badge-component">TinyDB Block / false</span>
+                        </div>
+                        <div class="ai2-socket socket-text">
+                            <span class="text-slate-200">tinyDbTag</span>
+                            <span class="type-badge badge-text">Text</span>
+                        </div>
+                        <div class="ai2-socket socket-logic">
+                            <span class="text-slate-200">isPin</span>
+                            <span class="type-badge badge-logic">Logic (true/false)</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="text-xs text-slate-300 leading-relaxed bg-slate-950 p-3 rounded-lg border border-slate-800/80">
+                    <strong class="text-cyan-400">Description:</strong> Opens a password/PIN creation dialog with strict validation rules, automatic SHA-256 salted hashing, visibility eye toggle, optional PIN keypad mode, and TinyDB integration.
+                </div>
+            </div>
+
+            <!-- 2. ShowPasswordRequestDialog -->
+            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 space-y-4">
+                <div class="ai2-block ai2-call-block">
+                    <div class="ai2-block-header">
+                        <span class="text-sky-200">call</span>
+                        <span class="text-white text-base">EHKDialogs . ShowPasswordRequestDialog</span>
+                    </div>
+                    <div class="ai2-sockets-container">
+                        <div class="ai2-socket socket-text">
+                            <span class="text-slate-200">title</span>
+                            <span class="type-badge badge-text">Text</span>
+                        </div>
+                        <div class="ai2-socket socket-text">
+                            <span class="text-slate-200">message</span>
+                            <span class="type-badge badge-text">Text</span>
+                        </div>
+                        <div class="ai2-socket socket-logic">
+                            <span class="text-slate-200">verify</span>
+                            <span class="type-badge badge-logic">Logic (true/false)</span>
+                        </div>
+                        <div class="ai2-socket socket-component">
+                            <span class="text-slate-200">tinyDbInstance</span>
+                            <span class="type-badge badge-component">TinyDB Block / false</span>
+                        </div>
+                        <div class="ai2-socket socket-text">
+                            <span class="text-slate-200">tinyDbTag</span>
+                            <span class="type-badge badge-text">Text</span>
+                        </div>
+                        <div class="ai2-socket socket-text">
+                            <span class="text-slate-200">sha256Salt</span>
+                            <span class="type-badge badge-text">Text / "false"</span>
+                        </div>
+                        <div class="ai2-socket socket-logic">
+                            <span class="text-slate-200">isPin</span>
+                            <span class="type-badge badge-logic">Logic (true/false)</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="text-xs text-slate-300 leading-relaxed bg-slate-950 p-3 rounded-lg border border-slate-800/80">
+                    <strong class="text-cyan-400">Description:</strong> Prompts for password/PIN input and automatically verifies it against TinyDB hash values.
+                </div>
+            </div>
+
+            <!-- 3. ShowPhoneNumberDialog -->
+            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 space-y-4">
+                <div class="ai2-block ai2-call-block">
+                    <div class="ai2-block-header">
+                        <span class="text-sky-200">call</span>
+                        <span class="text-white text-base">EHKDialogs . ShowPhoneNumberDialog</span>
+                    </div>
+                    <div class="ai2-sockets-container">
+                        <div class="ai2-socket socket-text">
+                            <span class="text-slate-200">title</span>
+                            <span class="type-badge badge-text">Text</span>
+                        </div>
+                        <div class="ai2-socket socket-text">
+                            <span class="text-slate-200">message</span>
+                            <span class="type-badge badge-text">Text</span>
+                        </div>
+                        <div class="ai2-socket socket-text">
+                            <span class="text-slate-200">format</span>
+                            <span class="type-badge badge-text">Text (e.g. +** *** *** ****)</span>
+                        </div>
+                        <div class="ai2-socket socket-component">
+                            <span class="text-slate-200">tinyDbInstance</span>
+                            <span class="type-badge badge-component">TinyDB Block / false</span>
+                        </div>
+                        <div class="ai2-socket socket-text">
+                            <span class="text-slate-200">tinyDbTag</span>
+                            <span class="type-badge badge-text">Text</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="text-xs text-slate-300 leading-relaxed bg-slate-950 p-3 rounded-lg border border-slate-800/80">
+                    <strong class="text-cyan-400">Description:</strong> Displays a phone entry dialog with real-time dynamic mask formatting.
+                </div>
+            </div>
+
+            <!-- 4. ShowEmailInputDialog -->
+            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 space-y-4">
+                <div class="ai2-block ai2-call-block">
+                    <div class="ai2-block-header">
+                        <span class="text-sky-200">call</span>
+                        <span class="text-white text-base">EHKDialogs . ShowEmailInputDialog</span>
+                    </div>
+                    <div class="ai2-sockets-container">
+                        <div class="ai2-socket socket-text">
+                            <span class="text-slate-200">title</span>
+                            <span class="type-badge badge-text">Text</span>
+                        </div>
+                        <div class="ai2-socket socket-text">
+                            <span class="text-slate-200">message</span>
+                            <span class="type-badge badge-text">Text</span>
+                        </div>
+                        <div class="ai2-socket socket-component">
+                            <span class="text-slate-200">tinyDbInstance</span>
+                            <span class="type-badge badge-component">TinyDB Block / false</span>
+                        </div>
+                        <div class="ai2-socket socket-text">
+                            <span class="text-slate-200">tinyDbTag</span>
+                            <span class="type-badge badge-text">Text</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="text-xs text-slate-300 leading-relaxed bg-slate-950 p-3 rounded-lg border border-slate-800/80">
+                    <strong class="text-cyan-400">Description:</strong> Displays an email text entry dialog with email keyboard layout and TinyDB auto-save capability.
+                </div>
+            </div>
+
+            <!-- 5. ShowProgressBarDialog -->
+            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 space-y-4">
+                <div class="ai2-block ai2-call-block">
+                    <div class="ai2-block-header">
+                        <span class="text-sky-200">call</span>
+                        <span class="text-white text-base">EHKDialogs . ShowProgressBarDialog</span>
+                    </div>
+                    <div class="ai2-sockets-container">
+                        <div class="ai2-socket socket-text">
+                            <span class="text-slate-200">title</span>
+                            <span class="type-badge badge-text">Text</span>
+                        </div>
+                        <div class="ai2-socket socket-text">
+                            <span class="text-slate-200">message</span>
+                            <span class="type-badge badge-text">Text</span>
+                        </div>
+                        <div class="ai2-socket socket-number">
+                            <span class="text-slate-200">totalProgress</span>
+                            <span class="type-badge badge-number">Number (e.g. 100)</span>
+                        </div>
+                        <div class="ai2-socket socket-text">
+                            <span class="text-slate-200">progressUnit</span>
+                            <span class="type-badge badge-text">Text (e.g. %, KB, sec)</span>
+                        </div>
+                        <div class="ai2-socket socket-logic">
+                            <span class="text-slate-200">unitIsPrefix</span>
+                            <span class="type-badge badge-logic">Logic (true/false)</span>
+                        </div>
+                        <div class="ai2-socket socket-logic">
+                            <span class="text-slate-200">cancelable</span>
+                            <span class="type-badge badge-logic">Logic (true/false)</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="text-xs text-slate-300 leading-relaxed bg-slate-950 p-3 rounded-lg border border-slate-800/80">
+                    <strong class="text-cyan-400">Description:</strong> Launches a system horizontal progress bar dialog with unit prefix/suffix positioning and cancellation support.
+                </div>
+            </div>
+
+            <!-- 6. UpdateProgressBarDialog -->
+            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 space-y-4">
+                <div class="ai2-block ai2-call-block">
+                    <div class="ai2-block-header">
+                        <span class="text-sky-200">call</span>
+                        <span class="text-white text-base">EHKDialogs . UpdateProgressBarDialog</span>
+                    </div>
+                    <div class="ai2-sockets-container">
+                        <div class="ai2-socket socket-text">
+                            <span class="text-slate-200">title</span>
+                            <span class="type-badge badge-text">Text (Read-only identifier)</span>
+                        </div>
+                        <div class="ai2-socket socket-text">
+                            <span class="text-slate-200">message</span>
+                            <span class="type-badge badge-text">Text (Read-only identifier)</span>
+                        </div>
+                        <div class="ai2-socket socket-number">
+                            <span class="text-slate-200">progress</span>
+                            <span class="type-badge badge-number">Number (Float)</span>
+                        </div>
+                        <div class="ai2-socket socket-text">
+                            <span class="text-slate-200">updateMessage</span>
+                            <span class="type-badge badge-text">Text</span>
+                        </div>
+                        <div class="ai2-socket socket-logic">
+                            <span class="text-slate-200">cancelable</span>
+                            <span class="type-badge badge-logic">Logic (true/false)</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="text-xs text-slate-300 leading-relaxed bg-slate-950 p-3 rounded-lg border border-slate-800/80">
+                    <strong class="text-cyan-400">Description:</strong> Updates the progress value and status message of an active horizontal progress bar dialog.
+                </div>
+            </div>
+
+            <!-- 7. DismissProgressBarDialog -->
+            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 space-y-4">
+                <div class="ai2-block ai2-call-block">
+                    <div class="ai2-block-header">
+                        <span class="text-sky-200">call</span>
+                        <span class="text-white text-base">EHKDialogs . DismissProgressBarDialog</span>
+                    </div>
+                    <div class="ai2-sockets-container">
+                        <div class="ai2-socket socket-text">
+                            <span class="text-slate-200">title</span>
+                            <span class="type-badge badge-text">Text (Read-only identifier)</span>
+                        </div>
+                        <div class="ai2-socket socket-text">
+                            <span class="text-slate-200">message</span>
+                            <span class="type-badge badge-text">Text (Read-only identifier)</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="text-xs text-slate-300 leading-relaxed bg-slate-950 p-3 rounded-lg border border-slate-800/80">
+                    <strong class="text-cyan-400">Description:</strong> Dismisses and closes the progress dialog.
+                </div>
+            </div>
+
+            <!-- Standard UI Dialogs Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+                <!-- Message Dialog -->
+                <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 space-y-3">
+                    <div class="ai2-block ai2-call-block">
+                        <div class="ai2-block-header">
+                            <span class="text-sky-200">call</span>
+                            <span class="text-white">EHKDialogs . ShowMessageDialog</span>
+                        </div>
+                        <div class="ai2-sockets-container">
+                            <div class="ai2-socket socket-text"><span class="text-slate-200">title</span><span class="type-badge badge-text">Text</span></div>
+                            <div class="ai2-socket socket-text"><span class="text-slate-200">message</span><span class="type-badge badge-text">Text</span></div>
+                            <div class="ai2-socket socket-text"><span class="text-slate-200">buttonText</span><span class="type-badge badge-text">Text</span></div>
+                        </div>
+                    </div>
+                    <div class="text-xs text-slate-400">Displays a basic alert modal dialog with an OK button.</div>
+                </div>
+
+                <!-- Confirm Dialog -->
+                <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 space-y-3">
+                    <div class="ai2-block ai2-call-block">
+                        <div class="ai2-block-header">
+                            <span class="text-sky-200">call</span>
+                            <span class="text-white">EHKDialogs . ShowConfirmDialog</span>
+                        </div>
+                        <div class="ai2-sockets-container">
+                            <div class="ai2-socket socket-text"><span class="text-slate-200">title</span><span class="type-badge badge-text">Text</span></div>
+                            <div class="ai2-socket socket-text"><span class="text-slate-200">message</span><span class="type-badge badge-text">Text</span></div>
+                            <div class="ai2-socket socket-text"><span class="text-slate-200">positiveText</span><span class="type-badge badge-text">Text</span></div>
+                            <div class="ai2-socket socket-text"><span class="text-slate-200">negativeText</span><span class="type-badge badge-text">Text</span></div>
+                        </div>
+                    </div>
+                    <div class="text-xs text-slate-400">Displays a confirmation prompt with positive and negative choices.</div>
+                </div>
+
+                <!-- Text Input Dialog -->
+                <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 space-y-3">
+                    <div class="ai2-block ai2-call-block">
+                        <div class="ai2-block-header">
+                            <span class="text-sky-200">call</span>
+                            <span class="text-white">EHKDialogs . ShowTextInputDialog</span>
+                        </div>
+                        <div class="ai2-sockets-container">
+                            <div class="ai2-socket socket-text"><span class="text-slate-200">title</span><span class="type-badge badge-text">Text</span></div>
+                            <div class="ai2-socket socket-text"><span class="text-slate-200">message</span><span class="type-badge badge-text">Text</span></div>
+                            <div class="ai2-socket socket-text"><span class="text-slate-200">defaultText</span><span class="type-badge badge-text">Text</span></div>
+                            <div class="ai2-socket socket-text"><span class="text-slate-200">hint</span><span class="type-badge badge-text">Text</span></div>
+                        </div>
+                    </div>
+                    <div class="text-xs text-slate-400">Displays a standard text field entry prompt dialog.</div>
+                </div>
+
+                <!-- List Selection Dialog -->
+                <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 space-y-3">
+                    <div class="ai2-block ai2-call-block">
+                        <div class="ai2-block-header">
+                            <span class="text-sky-200">call</span>
+                            <span class="text-white">EHKDialogs . ShowListSelectionDialog</span>
+                        </div>
+                        <div class="ai2-sockets-container">
+                            <div class="ai2-socket socket-text"><span class="text-slate-200">title</span><span class="type-badge badge-text">Text</span></div>
+                            <div class="ai2-socket socket-list"><span class="text-slate-200">items</span><span class="type-badge badge-list">List</span></div>
+                        </div>
+                    </div>
+                    <div class="text-xs text-slate-400">Displays a list picker popup for selecting single items.</div>
+                </div>
+
+            </div>
+
+        </div>
+    </section>
+
+    <!-- SECTION: EVENT BLOCKS -->
+    <section class="space-y-6">
+        <div class="flex items-center gap-2 border-b border-slate-800 pb-3">
+            <i class="fa-solid fa-bolt text-amber-400"></i>
+            <h2 class="text-xl font-bold text-white">Event Handler Blocks</h2>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+            <!-- PasswordSet Event -->
+            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 space-y-3">
+                <div class="ai2-block ai2-event-block">
+                    <div class="ai2-block-header flex-wrap">
+                        <span class="text-amber-200">when</span>
+                        <span class="text-white">EHKDialogs . PasswordSet</span>
+                        <div class="flex items-center gap-1.5 ml-auto">
+                            <span class="event-param-chip">output</span>
+                            <span class="event-param-chip">title</span>
+                            <span class="event-param-chip">message</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="text-xs text-slate-400">Triggered after password creation validation passes and hash/plain string is saved.</div>
+            </div>
+
+            <!-- PasswordEntered Event -->
+            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 space-y-3">
+                <div class="ai2-block ai2-event-block">
+                    <div class="ai2-block-header flex-wrap">
+                        <span class="text-amber-200">when</span>
+                        <span class="text-white">EHKDialogs . PasswordEntered</span>
+                        <div class="flex items-center gap-1.5 ml-auto">
+                            <span class="event-param-chip">isCorrect</span>
+                            <span class="event-param-chip">title</span>
+                            <span class="event-param-chip">message</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="text-xs text-slate-400">Triggered after user submits verification password or PIN.</div>
+            </div>
+
+            <!-- PhoneNumberEntered Event -->
+            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 space-y-3">
+                <div class="ai2-block ai2-event-block">
+                    <div class="ai2-block-header flex-wrap">
+                        <span class="text-amber-200">when</span>
+                        <span class="text-white">EHKDialogs . PhoneNumberEntered</span>
+                        <div class="flex items-center gap-1.5 ml-auto">
+                            <span class="event-param-chip">output</span>
+                            <span class="event-param-chip">title</span>
+                            <span class="event-param-chip">message</span>
+                            <span class="event-param-chip">format</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="text-xs text-slate-400">Triggered when phone number entry is submitted.</div>
+            </div>
+
+            <!-- EmailEntered Event -->
+            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 space-y-3">
+                <div class="ai2-block ai2-event-block">
+                    <div class="ai2-block-header flex-wrap">
+                        <span class="text-amber-200">when</span>
+                        <span class="text-white">EHKDialogs . EmailEntered</span>
+                        <div class="flex items-center gap-1.5 ml-auto">
+                            <span class="event-param-chip">output</span>
+                            <span class="event-param-chip">title</span>
+                            <span class="event-param-chip">message</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="text-xs text-slate-400">Triggered when an email entry is submitted.</div>
+            </div>
+
+            <!-- ProgressCanceled Event -->
+            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 space-y-3">
+                <div class="ai2-block ai2-event-block">
+                    <div class="ai2-block-header flex-wrap">
+                        <span class="text-amber-200">when</span>
+                        <span class="text-white">EHKDialogs . ProgressCanceled</span>
+                        <div class="flex items-center gap-1.5 ml-auto">
+                            <span class="event-param-chip">currentProgress</span>
+                            <span class="event-param-chip">title</span>
+                            <span class="event-param-chip">message</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="text-xs text-slate-400">Triggered when user cancels active progress dialog.</div>
+            </div>
+
+            <!-- AfterTextInput Event -->
+            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 space-y-3">
+                <div class="ai2-block ai2-event-block">
+                    <div class="ai2-block-header flex-wrap">
+                        <span class="text-amber-200">when</span>
+                        <span class="text-white">EHKDialogs . AfterTextInput</span>
+                        <div class="flex items-center gap-1.5 ml-auto">
+                            <span class="event-param-chip">result</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="text-xs text-slate-400">Triggered when standard text input dialog is submitted.</div>
+            </div>
+
+            <!-- AfterConfirmDialog Event -->
+            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 space-y-3">
+                <div class="ai2-block ai2-event-block">
+                    <div class="ai2-block-header flex-wrap">
+                        <span class="text-amber-200">when</span>
+                        <span class="text-white">EHKDialogs . AfterConfirmDialog</span>
+                        <div class="flex items-center gap-1.5 ml-auto">
+                            <span class="event-param-chip">confirmed</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="text-xs text-slate-400">Triggered when confirm dialog button is clicked.</div>
+            </div>
+
+            <!-- AfterListSelection Event -->
+            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 space-y-3">
+                <div class="ai2-block ai2-event-block">
+                    <div class="ai2-block-header flex-wrap">
+                        <span class="text-amber-200">when</span>
+                        <span class="text-white">EHKDialogs . AfterListSelection</span>
+                        <div class="flex items-center gap-1.5 ml-auto">
+                            <span class="event-param-chip">index</span>
+                            <span class="event-param-chip">item</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="text-xs text-slate-400">Triggered when an item from list selection dialog is chosen.</div>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="text-center text-xs text-slate-500 pt-8 border-t border-slate-800">
+        EHKDialogs Extension Reference
+    </footer>
+
+</body>
+</html>
