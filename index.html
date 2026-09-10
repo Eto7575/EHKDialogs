@@ -1,631 +1,974 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="h-full bg-slate-950">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EHKDialogs Extension - Block Reference</title>
+    <title>EHKDialogs Extension - Mıt App Block Reference</title>
+    <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Google Fonts & Font Awesome Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
     <style>
-        body { font-family: 'Inter', sans-serif; background-color: #0f172a; color: #f8fafc; }
+        body { font-family: 'Inter', sans-serif; }
         .code-font { font-family: 'Fira Code', monospace; }
 
-        /* App Inventor Visual Block Styling */
-        .ai2-block {
-            font-family: 'Inter', sans-serif;
-            font-size: 13px;
-            font-weight: 700;
-            border-radius: 6px;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.2);
-            position: relative;
-            user-select: none;
+        /* Custom scrollbars */
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: #090d16; }
+        ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #334155; }
+
+        /* App Inventor Workspace Grid Background */
+        .ai2-workspace-grid {
+            background-image: radial-gradient(rgba(255, 255, 255, 0.08) 1px, transparent 1px);
+            background-size: 24px 24px;
         }
 
-        /* Call (Method) Blocks */
-        .ai2-call-block {
-            background: linear-gradient(180deg, #0284c7 0%, #0369a1 100%);
-            border: 2px solid #075985;
-            color: #ffffff;
+        /* SVG Block Interaction and Glow */
+        .ai2-svg-block {
+            transition: transform 0.15s ease, filter 0.15s ease;
+            cursor: pointer;
+            max-width: none;
+            height: auto;
+        }
+        .ai2-svg-block:hover {
+            transform: translateY(-2px);
+            filter: drop-shadow(0 8px 16px rgba(0, 0, 0, 0.6));
+        }
+        .ai2-svg-block.selected {
+            filter: drop-shadow(0 0 12px rgba(6, 182, 212, 0.9));
         }
 
-        /* Event Blocks */
-        .ai2-event-block {
-            background: linear-gradient(180deg, #d97706 0%, #b45309 100%);
-            border: 2px solid #92400e;
-            color: #ffffff;
-        }
+        /* Block Container Scrollbar Fix */
+        .block-container-scroll::-webkit-scrollbar { height: 8px; }
+        .block-container-scroll::-webkit-scrollbar-track { background: rgba(15, 23, 42, 0.5); border-radius: 4px; }
+        .block-container-scroll::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
+        .block-container-scroll::-webkit-scrollbar-thumb:hover { background: #475569; }
 
-        /* Block Header / Title Bar */
-        .ai2-block-header {
-            padding: 8px 12px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            letter-spacing: 0.2px;
-        }
-
-        /* Sockets Area */
-        .ai2-sockets-container {
-            background-color: rgba(15, 23, 42, 0.25);
-            border-top: 1px solid rgba(0, 0, 0, 0.2);
-            padding: 6px 8px 8px 16px;
-            display: flex;
-            flex-direction: column;
-            gap: 6px;
-        }
-
-        /* Single Input Socket Slot */
-        .ai2-socket {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            background: rgba(0, 0, 0, 0.3);
-            border-radius: 4px;
-            padding: 4px 8px;
-            border-left: 3px solid transparent;
-        }
-
-        /* Socket Type Colors matching AI2 specs */
-        .socket-text { border-left-color: #ec4899; }
-        .socket-number { border-left-color: #3b82f6; }
-        .socket-logic { border-left-color: #22c55e; }
-        .socket-component { border-left-color: #14b8a6; }
-        .socket-list { border-left-color: #a855f7; }
-
-        /* Badges for Socket Types */
-        .type-badge {
-            font-size: 10px;
-            font-weight: 600;
-            padding: 2px 6px;
-            border-radius: 3px;
-            text-transform: uppercase;
-            font-family: 'Fira Code', monospace;
-        }
-        .badge-text { background-color: #831843; color: #fbcfe8; }
-        .badge-number { background-color: #1e3a8a; color: #bfdbfe; }
-        .badge-logic { background-color: #14532d; color: #bbf7d0; }
-        .badge-component { background-color: #134e4a; color: #99f6e4; }
-        .badge-list { background-color: #581c87; color: #e9d5ff; }
-
-        /* Output Param Chips for Events */
-        .event-param-chip {
-            background: #9a3412;
-            color: #ffedd5;
-            border: 1px solid #ea580c;
-            padding: 2px 8px;
-            border-radius: 12px;
-            font-size: 11px;
-            font-family: 'Fira Code', monospace;
-            font-weight: 600;
+        /* Responsive zoom wrapper styling */
+        #workspaceZoomWrapper {
+            transform-origin: 0 0;
+            transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
         }
     </style>
 </head>
-<body class="p-4 md:p-8 max-w-7xl mx-auto space-y-10">
+<body class="h-full flex flex-col overflow-hidden bg-slate-950 text-slate-100">
 
-    <!-- PAGE TITLE SECTION -->
-    <div class="border-b border-slate-800 pb-6">
-        <h1 class="text-3xl font-extrabold text-white tracking-tight flex items-center gap-3">
-            <i class="fa-solid fa-puzzle-piece text-cyan-400"></i>
-            EHKDialogs Block Reference
-        </h1>
-        <p class="mt-2 text-slate-400 text-sm max-w-3xl">
-            Visual block specifications, sockets, and callback handlers for the EHKDialogs extension.
-        </p>
+    <!-- TOP TOOLBAR & HEADER -->
+    <header class="bg-slate-900/90 backdrop-blur border-b border-slate-800 shrink-0 z-30 px-4 py-3 md:px-6">
+        <div class="max-w-7xl mx-auto flex flex-col md:flex-row md:items-center justify-between gap-4">
+            
+            <!-- LOGO AND TITLE -->
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-cyan-600 to-blue-600 flex items-center justify-center shadow-lg shadow-cyan-500/20 text-white text-xl">
+                    <i class="fa-solid fa-puzzle-piece"></i>
+                </div>
+                <div>
+                    <div class="flex items-center gap-2">
+                        <h1 class="text-lg font-bold text-white tracking-tight">EHKDialogs Extension</h1>
+                        <span class="text-[10px] font-mono font-bold bg-cyan-950 text-cyan-300 border border-cyan-800 px-2 py-0.5 rounded-full">v2.1 AI2</span>
+                    </div>
+                    <p class="text-xs text-slate-400"> </p>
+                </div>
+            </div>
+
+            <!-- SEARCH, FILTERS AND ZOOM -->
+            <div class="flex flex-wrap items-center gap-2 md:gap-3">
+                
+                <!-- SEARCH INPUT -->
+                <div class="relative flex-1 sm:w-64">
+                    <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 text-xs"></i>
+                    <input type="text" id="blockSearchInput" placeholder="Search blocks or params..." 
+                        class="w-full bg-slate-950 border border-slate-800 text-xs text-slate-200 placeholder-slate-500 rounded-xl pl-9 pr-8 py-2 focus:outline-none focus:border-cyan-500 transition-colors">
+                    <button id="clearSearchBtn" class="hidden absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-300 text-xs">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                </div>
+
+                <!-- CATEGORY FILTER BUTTONS -->
+                <div class="flex items-center bg-slate-950 p-1 rounded-xl border border-slate-800 text-xs">
+                    <button data-filter="all" class="filter-tab-btn active px-3 py-1 rounded-lg font-semibold bg-cyan-600 text-white transition-all">
+                        All <span id="cntAll" class="ml-1 text-[10px] opacity-80">25</span>
+                    </button>
+                    <button data-filter="event" class="filter-tab-btn px-3 py-1 rounded-lg font-semibold text-slate-400 hover:text-slate-200 transition-all">
+                        Events <span id="cntEvent" class="ml-1 text-[10px] opacity-80">11</span>
+                    </button>
+                    <button data-filter="method" class="filter-tab-btn px-3 py-1 rounded-lg font-semibold text-slate-400 hover:text-slate-200 transition-all">
+                        Methods <span id="cntMethod" class="ml-1 text-[10px] opacity-80">14</span>
+                    </button>
+                </div>
+
+                <!-- ZOOM CONTROLS -->
+                <div class="flex items-center bg-slate-950 rounded-xl border border-slate-800 px-1 py-1 text-xs">
+                    <button id="zoomOutBtn" class="p-1.5 text-slate-400 hover:text-white rounded-lg hover:bg-slate-800 transition-colors" title="Zoom Out">
+                        <i class="fa-solid fa-minus"></i>
+                    </button>
+                    <span id="zoomLevelText" class="px-2 font-mono text-[11px] font-bold text-slate-300 min-w-[42px] text-center">100%</span>
+                    <button id="zoomInBtn" class="p-1.5 text-slate-400 hover:text-white rounded-lg hover:bg-slate-800 transition-colors" title="Zoom In">
+                        <i class="fa-solid fa-plus"></i>
+                    </button>
+                    <button id="zoomResetBtn" class="p-1.5 text-slate-400 hover:text-white rounded-lg hover:bg-slate-800 transition-colors border-l border-slate-800 ml-1" title="Reset Zoom">
+                        <i class="fa-solid fa-rotate-right"></i>
+                    </button>
+                </div>
+
+            </div>
+
+        </div>
+    </header>
+
+    <!-- MAIN CONTENT VIEWPORT -->
+    <div class="flex-1 flex relative overflow-hidden">
+
+        <!-- WORKSPACE CANVAS -->
+        <main id="workspaceContainer" class="flex-1 overflow-auto ai2-workspace-grid relative p-4 md:p-8 select-none">
+            
+            <!-- CANVAS INNER ZOOM WRAPPER -->
+            <div id="workspaceZoomWrapper" class="space-y-10 min-w-0 max-w-full">
+
+                <!-- LEGEND BANNER -->
+                <div class="bg-slate-900/90 backdrop-blur border border-slate-800 rounded-2xl p-4 max-w-4xl shadow-xl flex flex-wrap items-center justify-between gap-4">
+                    <div class="flex items-center gap-4 text-xs">
+                        <span class="text-slate-400 font-bold uppercase tracking-wider flex items-center gap-1.5">
+                            <i class="fa-solid fa-palette text-cyan-400"></i> Block Palette:
+                        </span>
+                        <div class="flex items-center gap-2">
+                            <span class="w-3.5 h-3.5 rounded bg-amber-500 border border-amber-600 shadow-sm"></span>
+                            <span class="text-slate-300 font-semibold">Event Handlers (<code class="text-amber-300">when ... do</code>)</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span class="w-3.5 h-3.5 rounded bg-purple-600 border border-purple-700 shadow-sm"></span>
+                            <span class="text-slate-300 font-semibold">Method Calls (<code class="text-purple-300">call ...</code>)</span>
+                        </div>
+                    </div>
+                    <div class="text-xs text-slate-400 flex items-center gap-2">
+                        <i class="fa-solid fa-circle-info text-cyan-400"></i> Click any block to inspect details.
+                    </div>
+                </div>
+
+                <!-- SECTION 1: EVENT HANDLERS -->
+                <section id="eventBlocksSection" class="space-y-4">
+                    <div class="flex items-center gap-3 border-b border-slate-800 pb-2">
+                        <span class="w-3 h-6 rounded bg-amber-500"></span>
+                        <h2 class="text-xl font-bold text-white tracking-wide">Event Handler Blocks</h2>
+                        <span class="text-xs font-mono text-amber-400 bg-amber-950/60 border border-amber-800/60 px-2 py-0.5 rounded-full">11 Events</span>
+                    </div>
+
+                    <!-- EVENTS SVG GRID -->
+                    <div id="eventsGrid" class="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
+                        <!-- Dynamic Event SVGs -->
+                    </div>
+                </section>
+
+                <!-- SECTION 2: METHOD CALL BLOCKS -->
+                <section id="methodBlocksSection" class="space-y-4 pt-4">
+                    <div class="flex items-center gap-3 border-b border-slate-800 pb-2">
+                        <span class="w-3 h-6 rounded bg-purple-600"></span>
+                        <h2 class="text-xl font-bold text-white tracking-wide">Call Method Blocks</h2>
+                        <span class="text-xs font-mono text-purple-400 bg-purple-950/60 border border-purple-800/60 px-2 py-0.5 rounded-full">14 Methods</span>
+                    </div>
+
+                    <!-- METHODS SVG GRID -->
+                    <div id="methodsGrid" class="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
+                        <!-- Dynamic Method SVGs -->
+                    </div>
+                </section>
+
+                <!-- NO RESULTS STATE -->
+                <div id="noResultsState" class="hidden py-16 text-center space-y-4 max-w-md mx-auto">
+                    <div class="w-16 h-16 rounded-2xl bg-slate-900 border border-slate-800 flex items-center justify-center mx-auto text-slate-500 text-2xl">
+                        <i class="fa-solid fa-robot"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-bold text-white">No Matching Blocks Found</h3>
+                        <p class="text-xs text-slate-400 mt-1">Try adjusting your search query or filter settings.</p>
+                    </div>
+                </div>
+
+            </div>
+        </main>
+
+        <!-- RIGHT INSPECTOR SIDEBAR DRAWER -->
+        <aside id="inspectorSidebar" class="w-80 md:w-96 bg-slate-900 border-l border-slate-800 shadow-2xl flex flex-col z-20 absolute right-0 top-0 bottom-0 transition-transform transform translate-x-full">
+            
+            <!-- DRAWER HEADER -->
+            <div class="p-4 border-b border-slate-800 flex items-center justify-between bg-slate-950">
+                <div class="flex items-center gap-2">
+                    <i id="drawerBlockIcon" class="fa-solid fa-cube text-cyan-400"></i>
+                    <h3 class="font-bold text-sm text-white">Block Inspector</h3>
+                </div>
+                <button id="closeDrawerBtn" class="w-7 h-7 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 flex items-center justify-center transition-colors">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <!-- DRAWER CONTENT -->
+            <div class="flex-1 overflow-auto p-5 space-y-6">
+                
+                <!-- TITLE & BADGES -->
+                <div class="space-y-2">
+                    <div id="drawerBadges" class="flex flex-wrap gap-2"></div>
+                    <h2 id="drawerBlockTitle" class="text-xl font-bold text-white tracking-tight">Block Name</h2>
+                    <p id="drawerBlockSignature" class="text-xs font-mono text-cyan-400 bg-slate-950 p-2 rounded-lg border border-slate-800/80 break-all"></p>
+                </div>
+
+                <!-- DESCRIPTION -->
+                <div class="space-y-2">
+                    <h4 class="text-xs font-bold uppercase tracking-wider text-slate-400">Overview</h4>
+                    <p id="drawerDescription" class="text-xs text-slate-300 leading-relaxed bg-slate-950/60 p-3 rounded-xl border border-slate-800/60"></p>
+                </div>
+
+                <!-- PARAMETERS & SOCKETS -->
+                <div class="space-y-3">
+                    <h4 class="text-xs font-bold uppercase tracking-wider text-slate-400">Parameters / Sockets</h4>
+                    <div id="drawerParamsContainer" class="space-y-2 text-xs"></div>
+                </div>
+
+                <!-- CODE SIGNATURE SNIPPET -->
+                <div class="space-y-2">
+                    <div class="flex items-center justify-between">
+                        <h4 class="text-xs font-bold uppercase tracking-wider text-slate-400">AI2 Block Signature</h4>
+                        <button id="copySnippetBtn" class="text-[11px] text-cyan-400 hover:text-cyan-300 flex items-center gap-1">
+                            <i class="fa-regular fa-copy"></i> Copy
+                        </button>
+                    </div>
+                    <pre id="drawerCodeSnippet" class="code-font text-xs bg-slate-950 text-slate-200 p-3 rounded-xl border border-slate-800 overflow-x-auto"></pre>
+                </div>
+
+            </div>
+        </aside>
+
     </div>
 
-    <!-- QUICK LEGEND -->
-    <div class="bg-slate-900 border border-slate-800 rounded-xl p-4 flex flex-wrap items-center gap-6 text-xs">
-        <span class="text-slate-400 font-bold uppercase tracking-wider">Socket Types:</span>
-        <span class="flex items-center gap-2"><span class="w-3 h-3 rounded bg-pink-500"></span> Text Socket</span>
-        <span class="flex items-center gap-2"><span class="w-3 h-3 rounded bg-blue-500"></span> Number Socket</span>
-        <span class="flex items-center gap-2"><span class="w-3 h-3 rounded bg-green-500"></span> Logic (Boolean)</span>
-        <span class="flex items-center gap-2"><span class="w-3 h-3 rounded bg-teal-500"></span> Component</span>
-        <span class="flex items-center gap-2"><span class="w-3 h-3 rounded bg-purple-500"></span> List Socket</span>
+    <!-- TOAST NOTIFICATION -->
+    <div id="toast" class="fixed bottom-6 left-1/2 -translate-x-1/2 bg-cyan-600 text-white px-4 py-2 rounded-xl shadow-2xl text-xs font-semibold flex items-center gap-2 opacity-0 pointer-events-none transition-all duration-300 z-50">
+        <i class="fa-solid fa-check"></i>
+        <span id="toastMsg">Copied to clipboard!</span>
     </div>
 
-    <!-- SECTION: METHOD / CALL BLOCKS -->
-    <section class="space-y-6">
-        <div class="flex items-center gap-2 border-b border-slate-800 pb-3">
-            <i class="fa-solid fa-cube text-cyan-400"></i>
-            <h2 class="text-xl font-bold text-white">Call Method Blocks</h2>
-        </div>
+    <script>
+        // BLOCK SPECIFICATIONS DATA (100% ENGLISH)
+        const BLOCK_DATA = [
+            // --- EVENT HANDLERS (11 BLOCKS) ---
+            {
+                id: 'evt_after_confirm',
+                type: 'event',
+                name: 'AfterConfirmDialog',
+                desc: 'Fired when the user selects an option on the confirm dialog prompt.',
+                params: [{ name: 'confirmed', type: 'Logic', desc: 'Returns true if user clicked positive button, false if negative.' }]
+            },
+            {
+                id: 'evt_after_date',
+                type: 'event',
+                name: 'AfterDateSelected',
+                desc: 'Fired when a date selection has been made in the date picker dialog.',
+                params: [
+                    { name: 'year', type: 'Number', desc: 'Selected four-digit calendar year (e.g. 2026).' },
+                    { name: 'month', type: 'Number', desc: 'Selected month integer (1 to 12).' },
+                    { name: 'day', type: 'Number', desc: 'Selected day of the month integer (1 to 31).' }
+                ]
+            },
+            {
+                id: 'evt_after_list',
+                type: 'event',
+                name: 'AfterListSelection',
+                desc: 'Fired when the user selects an item from a list selection popup.',
+                params: [
+                    { name: 'index', type: 'Number', desc: '1-based index position of chosen item.' },
+                    { name: 'item', type: 'Text', desc: 'String value of chosen list item.' }
+                ]
+            },
+            {
+                id: 'evt_after_msg_closed',
+                type: 'event',
+                name: 'AfterMessageClosed',
+                desc: 'Fired when the user acknowledges and closes a message alert modal.',
+                params: []
+            },
+            {
+                id: 'evt_after_text_input',
+                type: 'event',
+                name: 'AfterTextInput',
+                desc: 'Fired when the user submits text input from a text entry dialog.',
+                params: [{ name: 'result', type: 'Text', desc: 'The string text entered by the user.' }]
+            },
+            {
+                id: 'evt_after_time',
+                type: 'event',
+                name: 'AfterTimeSelected',
+                desc: 'Fired when a time picker dialog selection is confirmed.',
+                params: [
+                    { name: 'hour', type: 'Number', desc: 'Hour of day (0-23).' },
+                    { name: 'minute', type: 'Number', desc: 'Minute of hour (0-59).' }
+                ]
+            },
+            {
+                id: 'evt_email_entered',
+                type: 'event',
+                name: 'EmailEntered',
+                desc: 'Fired when an email entry dialog is submitted with valid email input.',
+                params: [
+                    { name: 'output', type: 'Text', desc: 'The validated email address submitted.' },
+                    { name: 'title', type: 'Text', desc: 'Title string of originating dialog.' },
+                    { name: 'message', type: 'Text', desc: 'Message string of originating dialog.' }
+                ]
+            },
+            {
+                id: 'evt_password_entered',
+                type: 'event',
+                name: 'PasswordEntered',
+                desc: 'Fired after user inputs a password/PIN for verification check.',
+                params: [
+                    { name: 'isCorrect', type: 'Logic', desc: 'True if hash matches stored password hash.' },
+                    { name: 'title', type: 'Text', desc: 'Title string of originating dialog.' },
+                    { name: 'message', type: 'Text', desc: 'Message string of originating dialog.' }
+                ]
+            },
+            {
+                id: 'evt_password_set',
+                type: 'event',
+                name: 'PasswordSet',
+                desc: 'Fired when new password creation passes all validation rules and is saved.',
+                params: [
+                    { name: 'output', type: 'Text', desc: 'SHA-256 hashed or plain password value.' },
+                    { name: 'title', type: 'Text', desc: 'Title string of originating dialog.' },
+                    { name: 'message', type: 'Text', desc: 'Message string of originating dialog.' }
+                ]
+            },
+            {
+                id: 'evt_phone_entered',
+                type: 'event',
+                name: 'PhoneNumberEntered',
+                desc: 'Fired when user completes entry in the phone number entry dialog.',
+                params: [
+                    { name: 'output', type: 'Text', desc: 'Formatted phone string submitted by user.' },
+                    { name: 'title', type: 'Text', desc: 'Title string of originating dialog.' },
+                    { name: 'message', type: 'Text', desc: 'Message string of originating dialog.' },
+                    { name: 'format', type: 'Text', desc: 'Active phone format mask pattern.' }
+                ]
+            },
+            {
+                id: 'evt_progress_canceled',
+                type: 'event',
+                name: 'ProgressCanceled',
+                desc: 'Fired when user manually cancels an active progress bar dialog.',
+                params: [
+                    { name: 'currentProgress', type: 'Number', desc: 'Progress numeric value at instant of cancellation.' },
+                    { name: 'title', type: 'Text', desc: 'Title string of originating dialog.' },
+                    { name: 'message', type: 'Text', desc: 'Message string of originating dialog.' }
+                ]
+            },
 
-        <div class="space-y-8">
+            // --- CALL METHOD BLOCKS (14 BLOCKS) ---
+            {
+                id: 'meth_dismiss_progress',
+                type: 'method',
+                name: 'DismissProgressBarDialog',
+                desc: 'Programmatically closes and removes an active horizontal progress dialog from the screen.',
+                sockets: [
+                    { name: 'title', type: 'Text', desc: 'Title identifier of active dialog.' },
+                    { name: 'message', type: 'Text', desc: 'Message identifier of active dialog.' }
+                ]
+            },
+            {
+                id: 'meth_show_confirm',
+                type: 'method',
+                name: 'ShowConfirmDialog',
+                desc: 'Displays a custom confirmation prompt dialog with positive and negative choice action buttons.',
+                sockets: [
+                    { name: 'title', type: 'Text', desc: 'Header title string.' },
+                    { name: 'message', type: 'Text', desc: 'Main text description prompt.' },
+                    { name: 'positiveText', type: 'Text', desc: 'Label for positive action button (e.g. "Yes").' },
+                    { name: 'negativeText', type: 'Text', desc: 'Label for negative action button (e.g. "No").' }
+                ]
+            },
+            {
+                id: 'meth_show_toast',
+                type: 'method',
+                name: 'ShowCustomToast',
+                desc: 'Displays a custom toast popup message at bottom of screen.',
+                sockets: [
+                    { name: 'message', type: 'Text', desc: 'Toast message body text.' },
+                    { name: 'isLong', type: 'Logic', desc: 'True for long duration display, false for short.' }
+                ]
+            },
+            {
+                id: 'meth_show_date',
+                type: 'method',
+                name: 'ShowDatePickerDialog',
+                desc: 'Presents a native system calendar date selection modal dialog.',
+                sockets: [
+                    { name: 'title', type: 'Text', desc: 'Title header string for date picker.' }
+                ]
+            },
+            {
+                id: 'meth_show_email',
+                type: 'method',
+                name: 'ShowEmailInputDialog',
+                desc: 'Displays an email text entry dialog with quick keyboard layouts and auto TinyDB save options.',
+                sockets: [
+                    { name: 'title', type: 'Text', desc: 'Dialog title string.' },
+                    { name: 'message', type: 'Text', desc: 'Instructions message text.' },
+                    { name: 'tinyDbInstance', type: 'Component', desc: 'TinyDB component instance or false.' },
+                    { name: 'tinyDbTag', type: 'Text', desc: 'Tag key name for TinyDB storage.' }
+                ]
+            },
+            {
+                id: 'meth_show_list',
+                type: 'method',
+                name: 'ShowListSelectionDialog',
+                desc: 'Displays a selectable list picker dialog for single choice selection.',
+                sockets: [
+                    { name: 'title', type: 'Text', desc: 'Header title string.' },
+                    { name: 'items', type: 'List', desc: 'App Inventor List containing text items.' }
+                ]
+            },
+            {
+                id: 'meth_show_msg',
+                type: 'method',
+                name: 'ShowMessageDialog',
+                desc: 'Displays a simple notification alert modal dialog with single acknowledgment button.',
+                sockets: [
+                    { name: 'title', type: 'Text', desc: 'Dialog title string.' },
+                    { name: 'message', type: 'Text', desc: 'Notification message text.' },
+                    { name: 'buttonText', type: 'Text', desc: 'Button label (e.g. "OK").' }
+                ]
+            },
+            {
+                id: 'meth_show_pass_req',
+                type: 'method',
+                name: 'ShowPasswordRequestDialog',
+                desc: 'Prompts user for existing password or PIN and verifies it against TinyDB hash.',
+                sockets: [
+                    { name: 'title', type: 'Text', desc: 'Dialog title string.' },
+                    { name: 'message', type: 'Text', desc: 'Prompt instructions message.' },
+                    { name: 'verify', type: 'Logic', desc: 'True to automatically verify against TinyDB.' },
+                    { name: 'tinyDbInstance', type: 'Component', desc: 'TinyDB component instance or false.' },
+                    { name: 'tinyDbTag', type: 'Text', desc: 'Tag key name stored in TinyDB.' },
+                    { name: 'sha256Salt', type: 'Text', desc: 'Salt string for SHA-256 hash or "false".' },
+                    { name: 'isPin', type: 'Logic', desc: 'True for numeric PIN pad mode, false for normal.' }
+                ]
+            },
+            {
+                id: 'meth_show_pass_setup',
+                type: 'method',
+                name: 'ShowPasswordSetupDialog',
+                desc: 'Launches password/PIN creation dialog with min/max validation, dynamic error alerts, and salt hashing.',
+                sockets: [
+                    { name: 'title', type: 'Text', desc: 'Dialog title string.' },
+                    { name: 'message', type: 'Text', desc: 'Instructions prompt message.' },
+                    { name: 'minChars', type: 'Number', desc: 'Minimum allowed password length.' },
+                    { name: 'maxChars', type: 'Number', desc: 'Maximum allowed password length.' },
+                    { name: 'charErrorMsg', type: 'Text', desc: 'Validation error text for invalid length.' },
+                    { name: 'requireCase', type: 'Logic', desc: 'Require both uppercase & lowercase letters.' },
+                    { name: 'caseErrorMsg', type: 'Text', desc: 'Error message for missing case requirement.' },
+                    { name: 'requireDigit', type: 'Logic', desc: 'Require at least one numeric digit.' },
+                    { name: 'digitErrorMsg', type: 'Text', desc: 'Error message for missing digit.' },
+                    { name: 'sha256Salt', type: 'Text', desc: 'Salt string for hashing or "false".' },
+                    { name: 'tinyDbInstance', type: 'Component', desc: 'TinyDB component instance or false.' },
+                    { name: 'tinyDbTag', type: 'Text', desc: 'Tag key name for TinyDB auto-save.' },
+                    { name: 'isPin', type: 'Logic', desc: 'True for numeric PIN keypad mode.' }
+                ]
+            },
+            {
+                id: 'meth_show_phone',
+                type: 'method',
+                name: 'ShowPhoneNumberDialog',
+                desc: 'Opens a specialized phone input dialog with dynamic real-time formatting mask.',
+                sockets: [
+                    { name: 'title', type: 'Text', desc: 'Dialog title string.' },
+                    { name: 'message', type: 'Text', desc: 'Instructions message prompt.' },
+                    { name: 'format', type: 'Text', desc: 'Mask pattern (e.g. "+** *** *** ****").' },
+                    { name: 'tinyDbInstance', type: 'Component', desc: 'TinyDB component instance or false.' },
+                    { name: 'tinyDbTag', type: 'Text', desc: 'Tag key name in TinyDB.' }
+                ]
+            },
+            {
+                id: 'meth_show_progress',
+                type: 'method',
+                name: 'ShowProgressBarDialog',
+                desc: 'Displays a horizontal system progress bar dialog with custom total target value and unit prefix/suffix.',
+                sockets: [
+                    { name: 'title', type: 'Text', desc: 'Progress dialog title.' },
+                    { name: 'message', type: 'Text', desc: 'Initial status text.' },
+                    { name: 'totalProgress', type: 'Number', desc: 'Maximum target integer (e.g. 100).' },
+                    { name: 'progressUnit', type: 'Text', desc: 'Unit string (e.g. "%", "KB", "sec").' },
+                    { name: 'unitIsPrefix', type: 'Logic', desc: 'True to place unit before number, false after.' },
+                    { name: 'cancelable', type: 'Logic', desc: 'True to display cancel action button.' }
+                ]
+            },
+            {
+                id: 'meth_show_text',
+                type: 'method',
+                name: 'ShowTextInputDialog',
+                desc: 'Displays a standard text input field modal dialog with default text and placeholder hint.',
+                sockets: [
+                    { name: 'title', type: 'Text', desc: 'Dialog title string.' },
+                    { name: 'message', type: 'Text', desc: 'Prompt description message.' },
+                    { name: 'defaultText', type: 'Text', desc: 'Initial text inside input field.' },
+                    { name: 'hint', type: 'Text', desc: 'Placeholder hint text.' }
+                ]
+            },
+            {
+                id: 'meth_show_time',
+                type: 'method',
+                name: 'ShowTimePickerDialog',
+                desc: 'Displays system clock time picker dialog.',
+                sockets: [
+                    { name: 'title', type: 'Text', desc: 'Dialog title header.' }
+                ]
+            },
+            {
+                id: 'meth_update_progress',
+                type: 'method',
+                name: 'UpdateProgressBarDialog',
+                desc: 'Updates progress percentage bar value and text message of an existing progress dialog.',
+                sockets: [
+                    { name: 'title', type: 'Text', desc: 'Title identifier of target dialog.' },
+                    { name: 'message', type: 'Text', desc: 'Message identifier of target dialog.' },
+                    { name: 'progress', type: 'Number', desc: 'New progress numeric value.' },
+                    { name: 'updateMessage', type: 'Text', desc: 'New status text message string.' },
+                    { name: 'cancelable', type: 'Logic', desc: 'Update cancel button visibility.' }
+                ]
+            }
+        ];
 
-            <!-- 1. ShowPasswordSetupDialog -->
-            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 space-y-4">
-                <div class="ai2-block ai2-call-block">
-                    <div class="ai2-block-header">
-                        <span class="text-sky-200">call</span>
-                        <span class="text-white text-base">EHKDialogs . ShowPasswordSetupDialog</span>
-                    </div>
-                    <div class="ai2-sockets-container">
-                        <div class="ai2-socket socket-text">
-                            <span class="text-slate-200">title</span>
-                            <span class="type-badge badge-text">Text</span>
-                        </div>
-                        <div class="ai2-socket socket-text">
-                            <span class="text-slate-200">message</span>
-                            <span class="type-badge badge-text">Text</span>
-                        </div>
-                        <div class="ai2-socket socket-number">
-                            <span class="text-slate-200">minChars</span>
-                            <span class="type-badge badge-number">Number</span>
-                        </div>
-                        <div class="ai2-socket socket-number">
-                            <span class="text-slate-200">maxChars</span>
-                            <span class="type-badge badge-number">Number</span>
-                        </div>
-                        <div class="ai2-socket socket-text">
-                            <span class="text-slate-200">charErrorMsg</span>
-                            <span class="type-badge badge-text">Text</span>
-                        </div>
-                        <div class="ai2-socket socket-logic">
-                            <span class="text-slate-200">requireCase</span>
-                            <span class="type-badge badge-logic">Logic (true/false)</span>
-                        </div>
-                        <div class="ai2-socket socket-text">
-                            <span class="text-slate-200">caseErrorMsg</span>
-                            <span class="type-badge badge-text">Text</span>
-                        </div>
-                        <div class="ai2-socket socket-logic">
-                            <span class="text-slate-200">requireDigit</span>
-                            <span class="type-badge badge-logic">Logic (true/false)</span>
-                        </div>
-                        <div class="ai2-socket socket-text">
-                            <span class="text-slate-200">digitErrorMsg</span>
-                            <span class="type-badge badge-text">Text</span>
-                        </div>
-                        <div class="ai2-socket socket-text">
-                            <span class="text-slate-200">sha256Salt</span>
-                            <span class="type-badge badge-text">Text / "false"</span>
-                        </div>
-                        <div class="ai2-socket socket-component">
-                            <span class="text-slate-200">tinyDbInstance</span>
-                            <span class="type-badge badge-component">TinyDB Block / false</span>
-                        </div>
-                        <div class="ai2-socket socket-text">
-                            <span class="text-slate-200">tinyDbTag</span>
-                            <span class="type-badge badge-text">Text</span>
-                        </div>
-                        <div class="ai2-socket socket-logic">
-                            <span class="text-slate-200">isPin</span>
-                            <span class="type-badge badge-logic">Logic (true/false)</span>
-                        </div>
-                    </div>
-                </div>
+        // GLOBAL APPLICATION STATE
+        let zoomLevel = 1.0;
+        let searchQuery = '';
+        let currentFilter = 'all';
 
-                <div class="text-xs text-slate-300 leading-relaxed bg-slate-950 p-3 rounded-lg border border-slate-800/80">
-                    <strong class="text-cyan-400">Description:</strong> Opens a password/PIN creation dialog with strict validation rules, automatic SHA-256 salted hashing, visibility eye toggle, optional PIN keypad mode, and TinyDB integration.
-                </div>
-            </div>
+        // --- AUTHENTIC SVG BLOCK GENERATORS ---
 
-            <!-- 2. ShowPasswordRequestDialog -->
-            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 space-y-4">
-                <div class="ai2-block ai2-call-block">
-                    <div class="ai2-block-header">
-                        <span class="text-sky-200">call</span>
-                        <span class="text-white text-base">EHKDialogs . ShowPasswordRequestDialog</span>
-                    </div>
-                    <div class="ai2-sockets-container">
-                        <div class="ai2-socket socket-text">
-                            <span class="text-slate-200">title</span>
-                            <span class="type-badge badge-text">Text</span>
-                        </div>
-                        <div class="ai2-socket socket-text">
-                            <span class="text-slate-200">message</span>
-                            <span class="type-badge badge-text">Text</span>
-                        </div>
-                        <div class="ai2-socket socket-logic">
-                            <span class="text-slate-200">verify</span>
-                            <span class="type-badge badge-logic">Logic (true/false)</span>
-                        </div>
-                        <div class="ai2-socket socket-component">
-                            <span class="text-slate-200">tinyDbInstance</span>
-                            <span class="type-badge badge-component">TinyDB Block / false</span>
-                        </div>
-                        <div class="ai2-socket socket-text">
-                            <span class="text-slate-200">tinyDbTag</span>
-                            <span class="type-badge badge-text">Text</span>
-                        </div>
-                        <div class="ai2-socket socket-text">
-                            <span class="text-slate-200">sha256Salt</span>
-                            <span class="type-badge badge-text">Text / "false"</span>
-                        </div>
-                        <div class="ai2-socket socket-logic">
-                            <span class="text-slate-200">isPin</span>
-                            <span class="type-badge badge-logic">Logic (true/false)</span>
-                        </div>
-                    </div>
-                </div>
+        /**
+         * Event Block Generator (`when EHKDialogs1.Name ... do`)
+         * FIX APPLIED: Flat top edge (Hat block) + dynamic exact width calculation for param chips + horizontal scroll support.
+         */
+        function createEventBlockSVG(block) {
+            const headerHeight = 44;
+            const paramChips = block.params;
+            
+            // Calculate accurate start position for chips right after the event name text
+            const eventNameLen = block.name.length;
+            const startParamsX = 172 + Math.ceil(eventNameLen * 8.5) + 8;
 
-                <div class="text-xs text-slate-300 leading-relaxed bg-slate-950 p-3 rounded-lg border border-slate-800/80">
-                    <strong class="text-cyan-400">Description:</strong> Prompts for password/PIN input and automatically verifies it against TinyDB hash values.
-                </div>
-            </div>
+            let chipsSvgHtml = '';
+            let currentX = startParamsX;
 
-            <!-- 3. ShowPhoneNumberDialog -->
-            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 space-y-4">
-                <div class="ai2-block ai2-call-block">
-                    <div class="ai2-block-header">
-                        <span class="text-sky-200">call</span>
-                        <span class="text-white text-base">EHKDialogs . ShowPhoneNumberDialog</span>
-                    </div>
-                    <div class="ai2-sockets-container">
-                        <div class="ai2-socket socket-text">
-                            <span class="text-slate-200">title</span>
-                            <span class="type-badge badge-text">Text</span>
-                        </div>
-                        <div class="ai2-socket socket-text">
-                            <span class="text-slate-200">message</span>
-                            <span class="type-badge badge-text">Text</span>
-                        </div>
-                        <div class="ai2-socket socket-text">
-                            <span class="text-slate-200">format</span>
-                            <span class="type-badge badge-text">Text (e.g. +** *** *** ****)</span>
-                        </div>
-                        <div class="ai2-socket socket-component">
-                            <span class="text-slate-200">tinyDbInstance</span>
-                            <span class="type-badge badge-component">TinyDB Block / false</span>
-                        </div>
-                        <div class="ai2-socket socket-text">
-                            <span class="text-slate-200">tinyDbTag</span>
-                            <span class="type-badge badge-text">Text</span>
-                        </div>
-                    </div>
-                </div>
+            paramChips.forEach(p => {
+                const pWidth = Math.max(48, p.name.length * 8 + 18);
+                chipsSvgHtml += `
+                    <g transform="translate(${currentX}, 11)">
+                        <rect width="${pWidth}" height="22" rx="5" fill="#9a3412" stroke="#ea580c" stroke-width="1.2"/>
+                        <text x="${pWidth/2}" y="15" font-family="'Fira Code', monospace" font-size="11" font-weight="700" fill="#ffedd5" text-anchor="middle">${p.name}</text>
+                    </g>
+                `;
+                currentX += pWidth + 8;
+            });
 
-                <div class="text-xs text-slate-300 leading-relaxed bg-slate-950 p-3 rounded-lg border border-slate-800/80">
-                    <strong class="text-cyan-400">Description:</strong> Displays a phone entry dialog with real-time dynamic mask formatting.
-                </div>
-            </div>
+            const blockWidth = Math.max(380, currentX + 16);
+            const blockHeight = headerHeight + 56;
 
-            <!-- 4. ShowEmailInputDialog -->
-            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 space-y-4">
-                <div class="ai2-block ai2-call-block">
-                    <div class="ai2-block-header">
-                        <span class="text-sky-200">call</span>
-                        <span class="text-white text-base">EHKDialogs . ShowEmailInputDialog</span>
-                    </div>
-                    <div class="ai2-sockets-container">
-                        <div class="ai2-socket socket-text">
-                            <span class="text-slate-200">title</span>
-                            <span class="type-badge badge-text">Text</span>
-                        </div>
-                        <div class="ai2-socket socket-text">
-                            <span class="text-slate-200">message</span>
-                            <span class="type-badge badge-text">Text</span>
-                        </div>
-                        <div class="ai2-socket socket-component">
-                            <span class="text-slate-200">tinyDbInstance</span>
-                            <span class="type-badge badge-component">TinyDB Block / false</span>
-                        </div>
-                        <div class="ai2-socket socket-text">
-                            <span class="text-slate-200">tinyDbTag</span>
-                            <span class="type-badge badge-text">Text</span>
-                        </div>
-                    </div>
-                </div>
+            // SVG Path: Flat Top Edge (Hat Block)
+            return `
+                <svg class="ai2-svg-block shadow-lg rounded-lg shrink-0" data-id="${block.id}" 
+                     width="${blockWidth}" height="${blockHeight}"
+                     viewBox="0 0 ${blockWidth} ${blockHeight}" xmlns="http://www.w3.org/2000/svg">
+                    <defs>
+                        <linearGradient id="grad_event_${block.id}" x1="0%" y1="0%" x2="0%" y2="100%">
+                            <stop offset="0%" stop-color="#e5a93c"/>
+                            <stop offset="100%" stop-color="#d98d1e"/>
+                        </linearGradient>
+                        <filter id="shadow_${block.id}">
+                            <feDropShadow dx="0" dy="2" stdDeviation="2" flood-color="#000000" flood-opacity="0.3"/>
+                        </filter>
+                    </defs>
 
-                <div class="text-xs text-slate-300 leading-relaxed bg-slate-950 p-3 rounded-lg border border-slate-800/80">
-                    <strong class="text-cyan-400">Description:</strong> Displays an email text entry dialog with email keyboard layout and TinyDB auto-save capability.
-                </div>
-            </div>
+                    <!-- FLAT TOP HAT BLOCK PATH (NO NOTCH ON TOP) -->
+                    <path d="
+                        M 0 6 
+                        a 6 6 0 0 1 6 -6 
+                        H ${blockWidth - 6} 
+                        a 6 6 0 0 1 6 6 
+                        v ${headerHeight - 6} 
+                        a 4 4 0 0 1 -4 4 
+                        H 70 
+                        c -2 0 -4 2 -5 4 l -4 6 c -1 2 -3 3 -5 3 s -4 -1 -5 -3 l -4 -6 c -1 -2 -3 -4 -5 -4 
+                        H 16 
+                        a 4 4 0 0 0 -4 4 
+                        v 20 
+                        a 4 4 0 0 0 4 4 
+                        H 40 
+                        c 2 0 4 2 5 4 l 4 6 c 1 2 3 3 5 3 s 4 -1 5 -3 l 4 -6 c 1 -2 3 -4 5 -4 
+                        h ${blockWidth - 64} 
+                        a 4 4 0 0 1 4 4 
+                        v 14 
+                        a 4 4 0 0 1 -4 4 
+                        H 6 
+                        a 6 6 0 0 1 -6 -6 
+                        Z" 
+                        fill="url(#grad_event_${block.id})" stroke="#92400e" stroke-width="2" filter="url(#shadow_${block.id})"/>
 
-            <!-- 5. ShowProgressBarDialog -->
-            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 space-y-4">
-                <div class="ai2-block ai2-call-block">
-                    <div class="ai2-block-header">
-                        <span class="text-sky-200">call</span>
-                        <span class="text-white text-base">EHKDialogs . ShowProgressBarDialog</span>
-                    </div>
-                    <div class="ai2-sockets-container">
-                        <div class="ai2-socket socket-text">
-                            <span class="text-slate-200">title</span>
-                            <span class="type-badge badge-text">Text</span>
-                        </div>
-                        <div class="ai2-socket socket-text">
-                            <span class="text-slate-200">message</span>
-                            <span class="type-badge badge-text">Text</span>
-                        </div>
-                        <div class="ai2-socket socket-number">
-                            <span class="text-slate-200">totalProgress</span>
-                            <span class="type-badge badge-number">Number (e.g. 100)</span>
-                        </div>
-                        <div class="ai2-socket socket-text">
-                            <span class="text-slate-200">progressUnit</span>
-                            <span class="type-badge badge-text">Text (e.g. %, KB, sec)</span>
-                        </div>
-                        <div class="ai2-socket socket-logic">
-                            <span class="text-slate-200">unitIsPrefix</span>
-                            <span class="type-badge badge-logic">Logic (true/false)</span>
-                        </div>
-                        <div class="ai2-socket socket-logic">
-                            <span class="text-slate-200">cancelable</span>
-                            <span class="type-badge badge-logic">Logic (true/false)</span>
-                        </div>
-                    </div>
-                </div>
+                    <!-- HEADER TEXT -->
+                    <text x="14" y="27" font-family="'Inter', sans-serif" font-size="13" font-weight="800" fill="#ffffff">when</text>
+                    
+                    <!-- COMPONENT DROPDOWN CONTAINER -->
+                    <g transform="translate(56, 10)">
+                        <rect width="105" height="22" rx="4" fill="#b45309" stroke="#78350f" stroke-width="1"/>
+                        <text x="8" y="15" font-family="'Inter', sans-serif" font-size="11" font-weight="700" fill="#fef3c7">EHKDialogs1</text>
+                        <path d="M 94 8 L 98 14 L 90 14 Z" fill="#fef3c7"/>
+                    </g>
+                    
+                    <text x="166" y="27" font-family="'Inter', sans-serif" font-size="13" font-weight="800" fill="#ffffff">.</text>
+                    <text x="172" y="27" font-family="'Inter', sans-serif" font-size="13" font-weight="800" fill="#ffffff">${block.name}</text>
 
-                <div class="text-xs text-slate-300 leading-relaxed bg-slate-950 p-3 rounded-lg border border-slate-800/80">
-                    <strong class="text-cyan-400">Description:</strong> Launches a system horizontal progress bar dialog with unit prefix/suffix positioning and cancellation support.
-                </div>
-            </div>
+                    <!-- PARAMETER CHIPS -->
+                    ${chipsSvgHtml}
 
-            <!-- 6. UpdateProgressBarDialog -->
-            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 space-y-4">
-                <div class="ai2-block ai2-call-block">
-                    <div class="ai2-block-header">
-                        <span class="text-sky-200">call</span>
-                        <span class="text-white text-base">EHKDialogs . UpdateProgressBarDialog</span>
-                    </div>
-                    <div class="ai2-sockets-container">
-                        <div class="ai2-socket socket-text">
-                            <span class="text-slate-200">title</span>
-                            <span class="type-badge badge-text">Text (Read-only identifier)</span>
-                        </div>
-                        <div class="ai2-socket socket-text">
-                            <span class="text-slate-200">message</span>
-                            <span class="type-badge badge-text">Text (Read-only identifier)</span>
-                        </div>
-                        <div class="ai2-socket socket-number">
-                            <span class="text-slate-200">progress</span>
-                            <span class="type-badge badge-number">Number (Float)</span>
-                        </div>
-                        <div class="ai2-socket socket-text">
-                            <span class="text-slate-200">updateMessage</span>
-                            <span class="type-badge badge-text">Text</span>
-                        </div>
-                        <div class="ai2-socket socket-logic">
-                            <span class="text-slate-200">cancelable</span>
-                            <span class="type-badge badge-logic">Logic (true/false)</span>
-                        </div>
-                    </div>
-                </div>
+                    <!-- DO SOCKET LABEL -->
+                    <text x="22" y="${headerHeight + 20}" font-family="'Inter', sans-serif" font-size="13" font-weight="800" fill="#ffffff">do</text>
+                </svg>
+            `;
+        }
 
-                <div class="text-xs text-slate-300 leading-relaxed bg-slate-950 p-3 rounded-lg border border-slate-800/80">
-                    <strong class="text-cyan-400">Description:</strong> Updates the progress value and status message of an active horizontal progress bar dialog.
-                </div>
-            </div>
+        /**
+         * Method Call Block Generator (`call EHKDialogs1.Name` + Sockets)
+         * FIX APPLIED: Top female notch + Bottom male tab.
+         */
+        function createMethodBlockSVG(block) {
+            const socketHeight = 24;
+            const headerHeight = 40;
+            const sockets = block.sockets;
+            const bodyHeight = headerHeight + (sockets.length * socketHeight) + 6;
+            const totalSvgHeight = bodyHeight + 12; // Extra canvas space for bottom male tab
+            const blockWidth = 360;
 
-            <!-- 7. DismissProgressBarDialog -->
-            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 space-y-4">
-                <div class="ai2-block ai2-call-block">
-                    <div class="ai2-block-header">
-                        <span class="text-sky-200">call</span>
-                        <span class="text-white text-base">EHKDialogs . DismissProgressBarDialog</span>
-                    </div>
-                    <div class="ai2-sockets-container">
-                        <div class="ai2-socket socket-text">
-                            <span class="text-slate-200">title</span>
-                            <span class="type-badge badge-text">Text (Read-only identifier)</span>
-                        </div>
-                        <div class="ai2-socket socket-text">
-                            <span class="text-slate-200">message</span>
-                            <span class="type-badge badge-text">Text (Read-only identifier)</span>
-                        </div>
-                    </div>
-                </div>
+            let socketsSvgHtml = '';
+            sockets.forEach((s, idx) => {
+                const yPos = headerHeight + (idx * socketHeight) + 4;
+                
+                let badgeColor = "#ec4899"; // Text socket (pink)
+                if (s.type === 'Number') badgeColor = "#3b82f6";
+                else if (s.type === 'Logic') badgeColor = "#22c55e";
+                else if (s.type === 'Component') badgeColor = "#14b8a6";
+                else if (s.type === 'List') badgeColor = "#a855f7";
 
-                <div class="text-xs text-slate-300 leading-relaxed bg-slate-950 p-3 rounded-lg border border-slate-800/80">
-                    <strong class="text-cyan-400">Description:</strong> Dismisses and closes the progress dialog.
-                </div>
-            </div>
+                socketsSvgHtml += `
+                    <g transform="translate(0, ${yPos})">
+                        <!-- SOCKET LABEL -->
+                        <text x="24" y="16" font-family="'Inter', sans-serif" font-size="12" font-weight="700" fill="#f1f5f9">${s.name}</text>
 
-            <!-- Standard UI Dialogs Grid -->
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <!-- TYPE BADGE -->
+                        <rect x="${blockWidth - 95}" y="3" width="60" height="16" rx="3" fill="rgba(0,0,0,0.35)"/>
+                        <text x="${blockWidth - 65}" y="15" font-family="'Fira Code', monospace" font-size="9" font-weight="700" fill="${badgeColor}" text-anchor="middle">${s.type}</text>
 
-                <!-- Message Dialog -->
-                <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 space-y-3">
-                    <div class="ai2-block ai2-call-block">
-                        <div class="ai2-block-header">
-                            <span class="text-sky-200">call</span>
-                            <span class="text-white">EHKDialogs . ShowMessageDialog</span>
-                        </div>
-                        <div class="ai2-sockets-container">
-                            <div class="ai2-socket socket-text"><span class="text-slate-200">title</span><span class="type-badge badge-text">Text</span></div>
-                            <div class="ai2-socket socket-text"><span class="text-slate-200">message</span><span class="type-badge badge-text">Text</span></div>
-                            <div class="ai2-socket socket-text"><span class="text-slate-200">buttonText</span><span class="type-badge badge-text">Text</span></div>
-                        </div>
-                    </div>
-                    <div class="text-xs text-slate-400">Displays a basic alert modal dialog with an OK button.</div>
-                </div>
+                        <!-- FEMALE PUZZLE SOCKET CUTOUT RIGHT SIDE -->
+                        <path d="M ${blockWidth} 2 H ${blockWidth - 14} c -2 0 -3 2 -4 4 l -3 5 c -1 2 -1 4 0 5 l 3 5 c 1 2 2 4 4 4 H ${blockWidth} Z" fill="#4c1d95"/>
+                    </g>
+                `;
+            });
 
-                <!-- Confirm Dialog -->
-                <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 space-y-3">
-                    <div class="ai2-block ai2-call-block">
-                        <div class="ai2-block-header">
-                            <span class="text-sky-200">call</span>
-                            <span class="text-white">EHKDialogs . ShowConfirmDialog</span>
-                        </div>
-                        <div class="ai2-sockets-container">
-                            <div class="ai2-socket socket-text"><span class="text-slate-200">title</span><span class="type-badge badge-text">Text</span></div>
-                            <div class="ai2-socket socket-text"><span class="text-slate-200">message</span><span class="type-badge badge-text">Text</span></div>
-                            <div class="ai2-socket socket-text"><span class="text-slate-200">positiveText</span><span class="type-badge badge-text">Text</span></div>
-                            <div class="ai2-socket socket-text"><span class="text-slate-200">negativeText</span><span class="type-badge badge-text">Text</span></div>
-                        </div>
-                    </div>
-                    <div class="text-xs text-slate-400">Displays a confirmation prompt with positive and negative choices.</div>
-                </div>
+            // SVG Path: Top Female Notch + Bottom Male Tab
+            return `
+                <svg class="ai2-svg-block shadow-lg rounded-lg shrink-0" data-id="${block.id}" 
+                     width="${blockWidth}" height="${totalSvgHeight}"
+                     viewBox="0 0 ${blockWidth} ${totalSvgHeight}" xmlns="http://www.w3.org/2000/svg">
+                    <defs>
+                        <linearGradient id="grad_method_${block.id}" x1="0%" y1="0%" x2="0%" y2="100%">
+                            <stop offset="0%" stop-color="#8439b0"/>
+                            <stop offset="100%" stop-color="#692894"/>
+                        </linearGradient>
+                        <filter id="shadow_${block.id}">
+                            <feDropShadow dx="0" dy="2" stdDeviation="2" flood-color="#000000" flood-opacity="0.3"/>
+                        </filter>
+                    </defs>
 
-                <!-- Text Input Dialog -->
-                <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 space-y-3">
-                    <div class="ai2-block ai2-call-block">
-                        <div class="ai2-block-header">
-                            <span class="text-sky-200">call</span>
-                            <span class="text-white">EHKDialogs . ShowTextInputDialog</span>
-                        </div>
-                        <div class="ai2-sockets-container">
-                            <div class="ai2-socket socket-text"><span class="text-slate-200">title</span><span class="type-badge badge-text">Text</span></div>
-                            <div class="ai2-socket socket-text"><span class="text-slate-200">message</span><span class="type-badge badge-text">Text</span></div>
-                            <div class="ai2-socket socket-text"><span class="text-slate-200">defaultText</span><span class="type-badge badge-text">Text</span></div>
-                            <div class="ai2-socket socket-text"><span class="text-slate-200">hint</span><span class="type-badge badge-text">Text</span></div>
-                        </div>
-                    </div>
-                    <div class="text-xs text-slate-400">Displays a standard text field entry prompt dialog.</div>
-                </div>
+                    <!-- STATEMENT BLOCK PATH WITH TOP NOTCH & BOTTOM TAB -->
+                    <path d="
+                        M 0 4 
+                        a 4 4 0 0 1 4 -4 
+                        h 16 
+                        c 2 0 4 2 5 4 l 4 6 c 1 2 3 3 5 3 s 4 -1 5 -3 l 4 -6 c 1 -2 3 -4 5 -4 
+                        H ${blockWidth - 4} 
+                        a 4 4 0 0 1 4 4 
+                        v ${bodyHeight - 8} 
+                        a 4 4 0 0 1 -4 4 
+                        H 54 
+                        c -2 0 -4 2 -5 4 l -4 6 c -1 2 -3 3 -5 3 s -4 -1 -5 -3 l -4 -6 c -1 -2 -3 -4 -5 -4 
+                        H 4 
+                        a 4 4 0 0 1 -4 -4 
+                        Z" 
+                        fill="url(#grad_method_${block.id})" stroke="#581c87" stroke-width="2" filter="url(#shadow_${block.id})"/>
 
-                <!-- List Selection Dialog -->
-                <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 space-y-3">
-                    <div class="ai2-block ai2-call-block">
-                        <div class="ai2-block-header">
-                            <span class="text-sky-200">call</span>
-                            <span class="text-white">EHKDialogs . ShowListSelectionDialog</span>
-                        </div>
-                        <div class="ai2-sockets-container">
-                            <div class="ai2-socket socket-text"><span class="text-slate-200">title</span><span class="type-badge badge-text">Text</span></div>
-                            <div class="ai2-socket socket-list"><span class="text-slate-200">items</span><span class="type-badge badge-list">List</span></div>
-                        </div>
-                    </div>
-                    <div class="text-xs text-slate-400">Displays a list picker popup for selecting single items.</div>
-                </div>
+                    <!-- HEADER TEXT -->
+                    <text x="14" y="25" font-family="'Inter', sans-serif" font-size="13" font-weight="800" fill="#e9d5ff">call</text>
 
-            </div>
+                    <!-- COMPONENT DROPDOWN CONTAINER -->
+                    <g transform="translate(48, 8)">
+                        <rect width="100" height="22" rx="4" fill="#581c87" stroke="#3b0764" stroke-width="1"/>
+                        <text x="8" y="15" font-family="'Inter', sans-serif" font-size="11" font-weight="700" fill="#f3e8ff">EHKDialogs1</text>
+                        <path d="M 88 8 L 92 14 L 84 14 Z" fill="#f3e8ff"/>
+                    </g>
 
-        </div>
-    </section>
+                    <text x="153" y="25" font-family="'Inter', sans-serif" font-size="13" font-weight="800" fill="#ffffff">.</text>
+                    <text x="160" y="25" font-family="'Inter', sans-serif" font-size="13" font-weight="800" fill="#ffffff">${block.name}</text>
 
-    <!-- SECTION: EVENT BLOCKS -->
-    <section class="space-y-6">
-        <div class="flex items-center gap-2 border-b border-slate-800 pb-3">
-            <i class="fa-solid fa-bolt text-amber-400"></i>
-            <h2 class="text-xl font-bold text-white">Event Handler Blocks</h2>
-        </div>
+                    <!-- INPUT SOCKET SLOTS -->
+                    ${socketsSvgHtml}
+                </svg>
+            `;
+        }
 
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        // RENDER BLOCKS TO CANVAS
+        function renderAllBlocks() {
+            const eventsGrid = document.getElementById('eventsGrid');
+            const methodsGrid = document.getElementById('methodsGrid');
+            const eventSection = document.getElementById('eventBlocksSection');
+            const methodSection = document.getElementById('methodBlocksSection');
+            const noResults = document.getElementById('noResultsState');
 
-            <!-- PasswordSet Event -->
-            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 space-y-3">
-                <div class="ai2-block ai2-event-block">
-                    <div class="ai2-block-header flex-wrap">
-                        <span class="text-amber-200">when</span>
-                        <span class="text-white">EHKDialogs . PasswordSet</span>
-                        <div class="flex items-center gap-1.5 ml-auto">
-                            <span class="event-param-chip">output</span>
-                            <span class="event-param-chip">title</span>
-                            <span class="event-param-chip">message</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="text-xs text-slate-400">Triggered after password creation validation passes and hash/plain string is saved.</div>
-            </div>
+            if (!eventsGrid || !methodsGrid) return;
 
-            <!-- PasswordEntered Event -->
-            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 space-y-3">
-                <div class="ai2-block ai2-event-block">
-                    <div class="ai2-block-header flex-wrap">
-                        <span class="text-amber-200">when</span>
-                        <span class="text-white">EHKDialogs . PasswordEntered</span>
-                        <div class="flex items-center gap-1.5 ml-auto">
-                            <span class="event-param-chip">isCorrect</span>
-                            <span class="event-param-chip">title</span>
-                            <span class="event-param-chip">message</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="text-xs text-slate-400">Triggered after user submits verification password or PIN.</div>
-            </div>
+            eventsGrid.innerHTML = '';
+            methodsGrid.innerHTML = '';
 
-            <!-- PhoneNumberEntered Event -->
-            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 space-y-3">
-                <div class="ai2-block ai2-event-block">
-                    <div class="ai2-block-header flex-wrap">
-                        <span class="text-amber-200">when</span>
-                        <span class="text-white">EHKDialogs . PhoneNumberEntered</span>
-                        <div class="flex items-center gap-1.5 ml-auto">
-                            <span class="event-param-chip">output</span>
-                            <span class="event-param-chip">title</span>
-                            <span class="event-param-chip">message</span>
-                            <span class="event-param-chip">format</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="text-xs text-slate-400">Triggered when phone number entry is submitted.</div>
-            </div>
+            let eventCount = 0;
+            let methodCount = 0;
 
-            <!-- EmailEntered Event -->
-            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 space-y-3">
-                <div class="ai2-block ai2-event-block">
-                    <div class="ai2-block-header flex-wrap">
-                        <span class="text-amber-200">when</span>
-                        <span class="text-white">EHKDialogs . EmailEntered</span>
-                        <div class="flex items-center gap-1.5 ml-auto">
-                            <span class="event-param-chip">output</span>
-                            <span class="event-param-chip">title</span>
-                            <span class="event-param-chip">message</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="text-xs text-slate-400">Triggered when an email entry is submitted.</div>
-            </div>
+            BLOCK_DATA.forEach(block => {
+                if (currentFilter !== 'all' && block.type !== currentFilter) return;
 
-            <!-- ProgressCanceled Event -->
-            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 space-y-3">
-                <div class="ai2-block ai2-event-block">
-                    <div class="ai2-block-header flex-wrap">
-                        <span class="text-amber-200">when</span>
-                        <span class="text-white">EHKDialogs . ProgressCanceled</span>
-                        <div class="flex items-center gap-1.5 ml-auto">
-                            <span class="event-param-chip">currentProgress</span>
-                            <span class="event-param-chip">title</span>
-                            <span class="event-param-chip">message</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="text-xs text-slate-400">Triggered when user cancels active progress dialog.</div>
-            </div>
+                if (searchQuery !== '') {
+                    const q = searchQuery.toLowerCase();
+                    const matchesName = block.name.toLowerCase().includes(q);
+                    const matchesDesc = block.desc.toLowerCase().includes(q);
+                    const matchesParams = (block.params || []).some(p => p.name.toLowerCase().includes(q));
+                    const matchesSockets = (block.sockets || []).some(s => s.name.toLowerCase().includes(q));
 
-            <!-- AfterTextInput Event -->
-            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 space-y-3">
-                <div class="ai2-block ai2-event-block">
-                    <div class="ai2-block-header flex-wrap">
-                        <span class="text-amber-200">when</span>
-                        <span class="text-white">EHKDialogs . AfterTextInput</span>
-                        <div class="flex items-center gap-1.5 ml-auto">
-                            <span class="event-param-chip">result</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="text-xs text-slate-400">Triggered when standard text input dialog is submitted.</div>
-            </div>
+                    if (!matchesName && !matchesDesc && !matchesParams && !matchesSockets) return;
+                }
 
-            <!-- AfterConfirmDialog Event -->
-            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 space-y-3">
-                <div class="ai2-block ai2-event-block">
-                    <div class="ai2-block-header flex-wrap">
-                        <span class="text-amber-200">when</span>
-                        <span class="text-white">EHKDialogs . AfterConfirmDialog</span>
-                        <div class="flex items-center gap-1.5 ml-auto">
-                            <span class="event-param-chip">confirmed</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="text-xs text-slate-400">Triggered when confirm dialog button is clicked.</div>
-            </div>
+                if (block.type === 'event') {
+                    eventCount++;
+                    const container = document.createElement('div');
+                    container.className = 'flex flex-col gap-2 items-start bg-slate-900/40 border border-slate-800/80 p-4 rounded-2xl backdrop-blur-sm hover:border-amber-500/50 transition-colors overflow-x-auto max-w-full pb-4 min-w-0 block-container-scroll';
+                    container.innerHTML = `
+                        ${createEventBlockSVG(block)}
+                        <p class="text-xs text-slate-400 mt-1 pl-1 whitespace-normal">${block.desc}</p>
+                    `;
+                    eventsGrid.appendChild(container);
+                } else {
+                    methodCount++;
+                    const container = document.createElement('div');
+                    container.className = 'flex flex-col gap-2 items-start bg-slate-900/40 border border-slate-800/80 p-4 rounded-2xl backdrop-blur-sm hover:border-purple-500/50 transition-colors overflow-x-auto max-w-full pb-4 min-w-0 block-container-scroll';
+                    container.innerHTML = `
+                        ${createMethodBlockSVG(block)}
+                        <p class="text-xs text-slate-400 mt-1 pl-1 whitespace-normal">${block.desc}</p>
+                    `;
+                    methodsGrid.appendChild(container);
+                }
+            });
 
-            <!-- AfterListSelection Event -->
-            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 space-y-3">
-                <div class="ai2-block ai2-event-block">
-                    <div class="ai2-block-header flex-wrap">
-                        <span class="text-amber-200">when</span>
-                        <span class="text-white">EHKDialogs . AfterListSelection</span>
-                        <div class="flex items-center gap-1.5 ml-auto">
-                            <span class="event-param-chip">index</span>
-                            <span class="event-param-chip">item</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="text-xs text-slate-400">Triggered when an item from list selection dialog is chosen.</div>
-            </div>
+            // Toggle sections
+            if (eventCount === 0) eventSection.classList.add('hidden');
+            else eventSection.classList.remove('hidden');
 
-        </div>
-    </section>
+            if (methodCount === 0) methodSection.classList.add('hidden');
+            else methodSection.classList.remove('hidden');
 
-    <!-- FOOTER -->
-    <footer class="text-center text-xs text-slate-500 pt-8 border-t border-slate-800">
-        EHKDialogs Extension Reference
-    </footer>
+            if (eventCount === 0 && methodCount === 0) noResults.classList.remove('hidden');
+            else noResults.classList.add('hidden');
 
+            // Header counts update
+            if (document.getElementById('cntAll')) document.getElementById('cntAll').innerText = eventCount + methodCount;
+            if (document.getElementById('cntEvent')) document.getElementById('cntEvent').innerText = eventCount;
+            if (document.getElementById('cntMethod')) document.getElementById('cntMethod').innerText = methodCount;
+
+            attachBlockClickEvents();
+        }
+
+        // ATTACH CLICK HANDLERS
+        function attachBlockClickEvents() {
+            document.querySelectorAll('.ai2-svg-block').forEach(svg => {
+                svg.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const blockId = svg.getAttribute('data-id');
+                    const blockData = BLOCK_DATA.find(b => b.id === blockId);
+                    
+                    if (blockData) {
+                        document.querySelectorAll('.ai2-svg-block').forEach(el => el.classList.remove('selected'));
+                        svg.classList.add('selected');
+                        openInspectorDrawer(blockData);
+                    }
+                });
+            });
+        }
+
+        // OPEN DRAWER WITH DETAILS
+        function openInspectorDrawer(block) {
+            const drawer = document.getElementById('inspectorSidebar');
+            const title = document.getElementById('drawerBlockTitle');
+            const signature = document.getElementById('drawerBlockSignature');
+            const desc = document.getElementById('drawerDescription');
+            const badges = document.getElementById('drawerBadges');
+            const paramsContainer = document.getElementById('drawerParamsContainer');
+            const codeSnippet = document.getElementById('drawerCodeSnippet');
+            const icon = document.getElementById('drawerBlockIcon');
+
+            if (!drawer) return;
+            drawer.classList.remove('translate-x-full');
+
+            title.innerText = block.name;
+            desc.innerText = block.desc;
+
+            if (block.type === 'event') {
+                icon.className = "fa-solid fa-bolt text-amber-400";
+                badges.innerHTML = `<span class="px-2.5 py-1 rounded-md bg-amber-950 text-amber-300 font-mono font-bold text-[10px] border border-amber-800">EVENT HANDLER</span>`;
+                signature.innerText = `when EHKDialogs1.${block.name}`;
+                
+                if (block.params.length === 0) {
+                    paramsContainer.innerHTML = `<div class="text-slate-500 italic py-1">No parameters.</div>`;
+                } else {
+                    let html = '';
+                    block.params.forEach(p => {
+                        const badgeClass = p.type === 'Logic' ? 'bg-green-950 text-green-300 border-green-800' : 
+                                          p.type === 'Number' ? 'bg-blue-950 text-blue-300 border-blue-800' : 
+                                          'bg-pink-950 text-pink-300 border-pink-800';
+                        html += `
+                            <div class="bg-slate-950 border border-slate-800 rounded-xl p-2.5 flex flex-col gap-1">
+                                <div class="flex items-center justify-between">
+                                    <span class="font-mono font-bold text-slate-200">${p.name}</span>
+                                    <span class="px-2 py-0.5 rounded font-mono text-[9px] font-semibold border ${badgeClass}">${p.type}</span>
+                                </div>
+                                <span class="text-slate-400 text-[11px]">${p.desc}</span>
+                            </div>
+                        `;
+                    });
+                    paramsContainer.innerHTML = html;
+                }
+
+                codeSnippet.innerText = `when EHKDialogs1.${block.name} (${block.params.map(p => p.name).join(', ')}) {\n    // do logic here\n}`;
+
+            } else {
+                icon.className = "fa-solid fa-cube text-purple-400";
+                badges.innerHTML = `<span class="px-2.5 py-1 rounded-md bg-purple-950 text-purple-300 font-mono font-bold text-[10px] border border-purple-800">CALL METHOD</span>`;
+                signature.innerText = `call EHKDialogs1.${block.name}`;
+
+                if (block.sockets.length === 0) {
+                    paramsContainer.innerHTML = `<div class="text-slate-500 italic py-1">No socket parameters required.</div>`;
+                } else {
+                    let html = '';
+                    block.sockets.forEach(s => {
+                        const badgeClass = s.type === 'Logic' ? 'bg-green-950 text-green-300 border-green-800' : 
+                                          s.type === 'Number' ? 'bg-blue-950 text-blue-300 border-blue-800' : 
+                                          s.type === 'Component' ? 'bg-teal-950 text-teal-300 border-teal-800' : 
+                                          s.type === 'List' ? 'bg-purple-950 text-purple-300 border-purple-800' : 
+                                          'bg-pink-950 text-pink-300 border-pink-800';
+                        html += `
+                            <div class="bg-slate-950 border border-slate-800 rounded-xl p-2.5 flex flex-col gap-1">
+                                <div class="flex items-center justify-between">
+                                    <span class="font-mono font-bold text-slate-200">${s.name}</span>
+                                    <span class="px-2 py-0.5 rounded font-mono text-[9px] font-semibold border ${badgeClass}">${s.type}</span>
+                                </div>
+                                <span class="text-slate-400 text-[11px]">${s.desc}</span>
+                            </div>
+                        `;
+                    });
+                    paramsContainer.innerHTML = html;
+                }
+
+                codeSnippet.innerText = `call EHKDialogs1.${block.name}(\n  ${block.sockets.map(s => s.name).join(',\n  ')}\n)`;
+            }
+        }
+
+        // CLOSE INSPECTOR DRAWER
+        document.getElementById('closeDrawerBtn')?.addEventListener('click', () => {
+            document.getElementById('inspectorSidebar')?.classList.add('translate-x-full');
+            document.querySelectorAll('.ai2-svg-block').forEach(el => el.classList.remove('selected'));
+        });
+
+        // TOAST FEEDBACK
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            if (!toast) return;
+            document.getElementById('toastMsg').innerText = msg;
+            toast.classList.remove('opacity-0', 'pointer-events-none');
+            toast.classList.add('opacity-100');
+            setTimeout(() => {
+                toast.classList.remove('opacity-100');
+                toast.classList.add('opacity-0', 'pointer-events-none');
+            }, 2000);
+        }
+
+        // COPY SNIPPET
+        document.getElementById('copySnippetBtn')?.addEventListener('click', () => {
+            const text = document.getElementById('drawerCodeSnippet')?.innerText || '';
+            navigator.clipboard.writeText(text).then(() => {
+                showToast('Copied block code snippet!');
+            }).catch(() => {
+                showToast('Copied to clipboard!');
+            });
+        });
+
+        // SEARCH INPUT LISTENER
+        const searchInput = document.getElementById('blockSearchInput');
+        const clearBtn = document.getElementById('clearSearchBtn');
+
+        if (searchInput) {
+            searchInput.addEventListener('input', (e) => {
+                searchQuery = e.target.value.trim();
+                if (clearBtn) {
+                    if (searchQuery !== '') clearBtn.classList.remove('hidden');
+                    else clearBtn.classList.add('hidden');
+                }
+                renderAllBlocks();
+            });
+        }
+
+        if (clearBtn) {
+            clearBtn.addEventListener('click', () => {
+                if (searchInput) searchInput.value = '';
+                searchQuery = '';
+                clearBtn.classList.add('hidden');
+                renderAllBlocks();
+            });
+        }
+
+        // CATEGORY FILTER TABS
+        document.querySelectorAll('.filter-tab-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.filter-tab-btn').forEach(b => {
+                    b.classList.remove('bg-cyan-600', 'text-white', 'active');
+                    b.classList.add('text-slate-400');
+                });
+                btn.classList.add('bg-cyan-600', 'text-white', 'active');
+                btn.classList.remove('text-slate-400');
+                
+                currentFilter = btn.getAttribute('data-filter');
+                renderAllBlocks();
+            });
+        });
+
+        // CLEAN ZOOM CONTROLS
+        const zoomWrapper = document.getElementById('workspaceZoomWrapper');
+        const zoomText = document.getElementById('zoomLevelText');
+
+        function updateZoom(newLevel) {
+            zoomLevel = Math.max(0.6, Math.min(1.4, newLevel));
+            if (zoomWrapper) zoomWrapper.style.transform = `scale(${zoomLevel})`;
+            if (zoomText) zoomText.innerText = `${Math.round(zoomLevel * 100)}%`;
+        }
+
+        document.getElementById('zoomInBtn')?.addEventListener('click', () => updateZoom(zoomLevel + 0.15));
+        document.getElementById('zoomOutBtn')?.addEventListener('click', () => updateZoom(zoomLevel - 0.15));
+        document.getElementById('zoomResetBtn')?.addEventListener('click', () => updateZoom(1.0));
+
+        // INITIALIZATION
+        window.addEventListener('load', () => {
+            renderAllBlocks();
+        });
+    </script>
 </body>
 </html>
